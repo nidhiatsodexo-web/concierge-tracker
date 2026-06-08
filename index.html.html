@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Concierge Daily Utilization Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:       #0D1B2A;
+    --blue:       #1B4F72;
+    --accent:     #2E86C1;
+    --uk-purple:  #6C3483;
+    --uk-light:   #EDE0F5;
+    --us-teal:    #117A65;
+    --us-light:   #D5F5E3;
+    --white:      #FFFFFF;
+    --off-white:  #F7F9FC;
+    --border:     #DDE3EC;
+    --text:       #1A2332;
+    --muted:      #6B7A99;
+    --danger:     #C0392B;
+    --success:    #1E8449;
+    --radius:     12px;
+    --shadow:     0 4px 24px rgba(13,27,42,0.10);
+    --shadow-sm:  0 2px 8px rgba(13,27,42,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(46,134,193,0.15);
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 10%;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #A9CCE3;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .page-header h1 {
+    color: var(--white);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+  .page-header p {
+    color: #A9CCE3;
+    font-size: 13px;
+    margin-top: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Card ── */
+  .form-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 24px auto;
+    max-width: 760px;
+    overflow: hidden;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-body { padding: 28px 28px 0; }
+
+  /* ── Grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 600px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .page-header h1 { font-size: 20px; }
+  }
+
+  /* ── Field ── */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.2px;
+  }
+  .field label span { color: var(--danger); margin-left: 2px; }
+
+  .field input, .field select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.18s, box-shadow 0.18s;
+    outline: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(46,134,193,0.12);
+  }
+  .field input.error, .field select.error {
+    border-color: var(--danger);
+  }
+  .field .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Toggle ── */
+  .toggle-group {
+    display: flex;
+    background: var(--off-white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 42px;
+  }
+  .toggle-group input[type="radio"] { display: none; }
+  .toggle-group label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.18s;
+    letter-spacing: 0.3px;
+  }
+  .toggle-group input[type="radio"]:checked + label {
+    background: var(--accent);
+    color: var(--white);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+  }
+  .toggle-group.region input[type="radio"]:checked + label.uk {
+    background: var(--uk-purple);
+  }
+  .toggle-group.region input[type="radio"]:checked + label.us {
+    background: var(--us-teal);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* ── Case Block ── */
+  .cases-wrapper { padding: 0 28px 28px; }
+
+  .case-block {
+    background: var(--off-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .case-block:focus-within {
+    border-color: var(--accent);
+  }
+  .case-block.uk-mode {
+    border-left: 3px solid var(--uk-purple);
+  }
+  .case-block.us-mode {
+    border-left: 3px solid var(--us-teal);
+  }
+
+  .case-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .case-number-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .btn-remove {
+    background: none;
+    border: 1.5px solid #E8D0CD;
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-remove:hover {
+    background: #FDF0EE;
+    border-color: var(--danger);
+  }
+
+  /* Task sections inside case */
+  .task-section {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .task-section.research { border-top: 2px solid var(--accent); }
+  .task-section.workflow { border-top: 2px solid var(--uk-purple); }
+
+  .task-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .task-section.research .task-section-title { color: var(--accent); }
+  .task-section.workflow .task-section-title { color: var(--uk-purple); }
+
+  /* ── Add Case Button ── */
+  .btn-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background: var(--white);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-top: 4px;
+  }
+  .btn-add:hover {
+    border-color: var(--accent);
+    background: #EBF5FB;
+  }
+  .btn-add svg { width: 18px; height: 18px; }
+
+  /* ── Submit ── */
+  .submit-bar {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .btn-submit {
+    flex: 1;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.18s, transform 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  .btn-reset {
+    padding: 14px 22px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 999;
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error   { background: var(--danger); }
+
+  /* ── Loading overlay ── */
+  .spinner-wrap {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,27,42,0.45);
+    z-index: 900;
+    align-items: center;
+    justify-content: center;
+  }
+  .spinner-wrap.active { display: flex; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Region indicator pill ── */
+  .region-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: none;
+    margin-top: 8px;
+  }
+  .region-pill.uk { background: var(--uk-light); color: var(--uk-purple); }
+  .region-pill.us { background: var(--us-light); color: var(--us-teal); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-badge">Concierge Team</div>
+  <h1>Daily Utilization Tracker</h1>
+  <p>Log your cases and efforts for the day</p>
+</div>
+
+<!-- Spinner -->
+<div class="spinner-wrap" id="spinner"><div class="spinner"></div></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Main card -->
+<div class="form-card" id="mainForm">
+
+  <div class="form-body">
+    <div class="section-label">Daily Info</div>
+
+    <div class="grid-2">
+      <!-- Date -->
+      <div class="field">
+        <label>Date <span>*</span></label>
+        <input type="date" id="date" required />
+      </div>
+
+      <!-- Name -->
+      <div class="field">
+        <label>Your Name <span>*</span></label>
+        <select id="name" required>
+          <option value="">— Select your name —</option>
+          <optgroup label="🇬🇧 UK Team">
+            <option value="Pooja Gupta">Pooja Gupta</option>
+            <option value="Nisarga Gowda">Nisarga Gowda</option>
+            <option value="Vinit Shetty">Vinit Shetty</option>
+          </optgroup>
+          <optgroup label="🇺🇸 US Team">
+            <option value="Ashutosh Jaiswal">Ashutosh Jaiswal</option>
+            <option value="Vivian Vaz">Vivian Vaz</option>
+            <option value="Vishakha Joshi">Vishakha Joshi</option>
+            <option value="Aditya Patil">Aditya Patil</option>
+            <option value="Nirmal Pandi">Nirmal Pandi</option>
+            <option value="Maaz Lal">Maaz Lal</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px;">
+      <!-- WFH / WFO -->
+      <div class="field">
+        <label>Work Location <span>*</span></label>
+        <div class="toggle-group" id="wfhToggle">
+          <input type="radio" name="wfh" id="wfh_wfh" value="WFH" />
+          <label for="wfh_wfh">🏠 WFH</label>
+          <input type="radio" name="wfh" id="wfh_wfo" value="WFO" />
+          <label for="wfh_wfo">🏢 WFO</label>
+        </div>
+      </div>
+
+      <!-- Region -->
+      <div class="field">
+        <label>Region <span>*</span></label>
+        <div class="toggle-group region" id="regionToggle">
+          <input type="radio" name="region" id="reg_uk" value="UK" />
+          <label for="reg_uk" class="uk">🇬🇧 UK</label>
+          <input type="radio" name="region" id="reg_us" value="US" />
+          <label for="reg_us" class="us">🇺🇸 US</label>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-body -->
+
+  <div class="divider" style="margin:24px 0 0;"></div>
+
+  <!-- Cases section -->
+  <div class="cases-wrapper">
+    <div class="section-label" style="padding-top:24px;">Cases Worked On</div>
+
+    <div id="casesContainer"></div>
+
+    <button class="btn-add" type="button" id="addCaseBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Add Another Case
+    </button>
+  </div>
+
+  <div class="submit-bar">
+    <button class="btn-reset" type="button" id="resetBtn">Reset</button>
+    <button class="btn-submit" type="button" id="submitBtn">Submit Daily Log →</button>
+  </div>
+
+</div><!-- /form-card -->
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const POWER_AUTOMATE_URL = "YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL_HERE";
+
+// ── State ────────────────────────────────────────────────────────────────────
+let caseCount = 0;
+let currentRegion = "";
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.getElementById("date").value = new Date().toISOString().split("T")[0];
+addCase(); // start with one case
+
+// ── Region change ─────────────────────────────────────────────────────────────
+document.querySelectorAll('input[name="region"]').forEach(r => {
+  r.addEventListener("change", () => {
+    currentRegion = r.value;
+    updateAllCasesForRegion();
+  });
+});
+
+function updateAllCasesForRegion() {
+  document.querySelectorAll(".case-block").forEach(block => {
+    block.classList.toggle("uk-mode", currentRegion === "UK");
+    block.classList.toggle("us-mode", currentRegion === "US");
+    const wf = block.querySelector(".workflow-section");
+    if (wf) wf.style.display = currentRegion === "UK" ? "block" : "none";
+  });
+}
+
+// ── Add Case ──────────────────────────────────────────────────────────────────
+document.getElementById("addCaseBtn").addEventListener("click", addCase);
+
+function addCase() {
+  caseCount++;
+  const id = caseCount;
+  const isUK = currentRegion === "UK";
+
+  const block = document.createElement("div");
+  block.className = `case-block ${isUK ? "uk-mode" : currentRegion === "US" ? "us-mode" : ""}`;
+  block.dataset.caseId = id;
+
+  block.innerHTML = `
+    <div class="case-header">
+      <span class="case-number-badge">Case ${id}</span>
+      ${id > 1 ? `<button class="btn-remove" type="button" onclick="removeCase(${id})">✕ Remove</button>` : ""}
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Case Number <span>*</span></label>
+        <input type="text" id="caseNum_${id}" placeholder="e.g. 123456"
+               inputmode="numeric" pattern="[0-9]+"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+        <span class="hint">Numbers only</span>
+      </div>
+      <div></div>
+    </div>
+
+    <!-- Research -->
+    <div class="task-section research" style="margin-top:12px;">
+      <div class="task-section-title">🔍 Research</div>
+      <div class="field">
+        <label>Effort (minutes) <span>*</span></label>
+        <input type="number" id="resEffort_${id}" placeholder="e.g. 60" min="0" />
+      </div>
+    </div>
+
+    <!-- Workflow (UK only) -->
+    <div class="task-section workflow workflow-section" style="${isUK ? "" : "display:none;"}">
+      <div class="task-section-title">⚙️ Workflow</div>
+      <div class="field">
+        <label>Effort (minutes)</label>
+        <input type="number" id="wfEffort_${id}" placeholder="e.g. 30" min="0" />
+      </div>
+    </div>
+  `;
+
+  document.getElementById("casesContainer").appendChild(block);
+}
+
+function removeCase(id) {
+  const block = document.querySelector(`[data-case-id="${id}"]`);
+  if (block) block.remove();
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Reset the entire form?")) return;
+  document.getElementById("date").value = new Date().toISOString().split("T")[0];
+  document.getElementById("name").value = "";
+  document.querySelectorAll('input[name="wfh"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="region"]').forEach(r => r.checked = false);
+  currentRegion = "";
+  caseCount = 0;
+  document.getElementById("casesContainer").innerHTML = "";
+  addCase();
+});
+
+// ── Validate ──────────────────────────────────────────────────────────────────
+function validate() {
+  let ok = true;
+
+  const date = document.getElementById("date").value;
+  const name = document.getElementById("name").value;
+  const wfh  = document.querySelector('input[name="wfh"]:checked');
+  const region = document.querySelector('input[name="region"]:checked');
+
+  if (!date) { highlight("date"); ok = false; }
+  if (!name) { highlight("name"); ok = false; }
+  if (!wfh)  { showToast("Please select Work Location (WFH/WFO)", "error"); ok = false; }
+  if (!region) { showToast("Please select a Region", "error"); ok = false; }
+
+  const cases = document.querySelectorAll(".case-block");
+  if (cases.length === 0) { showToast("Add at least one case", "error"); return false; }
+
+  cases.forEach(block => {
+    const id = block.dataset.caseId;
+    const caseNum = document.getElementById(`caseNum_${id}`).value;
+    const resEffort = document.getElementById(`resEffort_${id}`).value;
+
+    if (!caseNum) { highlight(`caseNum_${id}`); ok = false; }
+    if (!resEffort && resEffort !== "0") { highlight(`resEffort_${id}`); ok = false; }
+  });
+
+  return ok;
+}
+
+function highlight(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add("error");
+    el.addEventListener("input", () => el.classList.remove("error"), { once: true });
+    el.addEventListener("change", () => el.classList.remove("error"), { once: true });
+  }
+}
+
+// ── Build payload ─────────────────────────────────────────────────────────────
+function buildPayload() {
+  const date   = document.getElementById("date").value;
+  const name   = document.getElementById("name").value;
+  const wfh    = document.querySelector('input[name="wfh"]:checked').value;
+  const region = document.querySelector('input[name="region"]:checked').value;
+
+  const rows = [];
+
+  document.querySelectorAll(".case-block").forEach(block => {
+    const id = block.dataset.caseId;
+    const caseNum   = document.getElementById(`caseNum_${id}`).value;
+    const resEffort = parseInt(document.getElementById(`resEffort_${id}`).value) || 0;
+
+    // Research row (all members)
+    if (resEffort > 0) {
+      rows.push({ date, name, region, wfh_wfo: wfh, case_number: caseNum,
+                  task: "Research", effort_mins: resEffort });
+    }
+
+    // Workflow row (UK only)
+    if (region === "UK") {
+      const wfEffort = parseInt(document.getElementById(`wfEffort_${id}`).value) || 0;
+      if (wfEffort > 0) {
+        rows.push({ date, name, region, wfh_wfo: wfh, case_number: caseNum,
+                    task: "Workflow", effort_mins: wfEffort });
+      }
+    }
+  });
+
+  return { submissions: rows };
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────────────
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  if (!validate()) return;
+
+  const payload = buildPayload();
+  if (payload.submissions.length === 0) {
+    showToast("No data to submit — fill in counts or efforts", "error");
+    return;
+  }
+
+  document.getElementById("spinner").classList.add("active");
+  document.getElementById("submitBtn").disabled = true;
+
+  try {
+    const res = await fetch(POWER_AUTOMATE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok || res.status === 202) {
+      showToast(`✅ ${payload.submissions.length} row(s) submitted successfully!`, "success");
+      setTimeout(() => {
+        document.getElementById("resetBtn").click();
+      }, 2000);
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch (err) {
+    showToast("❌ Submission failed. Please try again.", "error");
+    console.error(err);
+  } finally {
+    document.getElementById("spinner").classList.remove("active");
+    document.getElementById("submitBtn").disabled = false;
+  }
+});
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 4000);
+}
+</script>
+</body>
+</html>
