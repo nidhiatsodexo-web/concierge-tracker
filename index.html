@@ -527,11 +527,24 @@ document.querySelectorAll('input[name="region"]').forEach(r => {
 });
 
 function updateAllCasesForRegion() {
+  const ukTypes = ["Automotive","Company event","Dining","Education","Eldercare","Errand Running","Event Planning","Everyday Life","Finance","Health & Wellbeing","Home service","Legal","Leisure","Member support","Pet care","Planning & Research","Retail","Real Estate","Travel"];
+  const usTypes = ["Automotive","Childcare","Dining","Education","Entertainment","Errand Running","Event Planning","Finance","Health","Household services","Legal","Lifestyle","Local Information","Pet care","Planning & Research","Real Estate","Shopping","Travel"];
+
   document.querySelectorAll(".case-block").forEach(block => {
     block.classList.toggle("uk-mode", currentRegion === "UK");
     block.classList.toggle("us-mode", currentRegion === "US");
     const wf = block.querySelector(".workflow-section");
     if (wf) wf.style.display = currentRegion === "UK" ? "block" : "none";
+
+    // Refresh Type of Request dropdown
+    const id = block.dataset.caseId;
+    const sel = document.getElementById(`reqType_${id}`);
+    if (sel) {
+      const current = sel.value;
+      const types = currentRegion === "UK" ? ukTypes : usTypes;
+      sel.innerHTML = `<option value="">— Select type —</option>` +
+        types.map(t => `<option${t === current ? " selected" : ""}>${t}</option>`).join("");
+    }
   });
 }
 
@@ -561,7 +574,52 @@ function addCase() {
                oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
         <span class="hint">Numbers only</span>
       </div>
-      <div></div>
+      <div class="field">
+        <label>Type of Request <span>*</span></label>
+        <select id="reqType_${id}">
+          <option value="">— Select type —</option>
+          ${isUK ? `
+            <option>Automotive</option>
+            <option>Company event</option>
+            <option>Dining</option>
+            <option>Education</option>
+            <option>Eldercare</option>
+            <option>Errand Running</option>
+            <option>Event Planning</option>
+            <option>Everyday Life</option>
+            <option>Finance</option>
+            <option>Health &amp; Wellbeing</option>
+            <option>Home service</option>
+            <option>Legal</option>
+            <option>Leisure</option>
+            <option>Member support</option>
+            <option>Pet care</option>
+            <option>Planning &amp; Research</option>
+            <option>Retail</option>
+            <option>Real Estate</option>
+            <option>Travel</option>
+          ` : `
+            <option>Automotive</option>
+            <option>Childcare</option>
+            <option>Dining</option>
+            <option>Education</option>
+            <option>Entertainment</option>
+            <option>Errand Running</option>
+            <option>Event Planning</option>
+            <option>Finance</option>
+            <option>Health</option>
+            <option>Household services</option>
+            <option>Legal</option>
+            <option>Lifestyle</option>
+            <option>Local Information</option>
+            <option>Pet care</option>
+            <option>Planning &amp; Research</option>
+            <option>Real Estate</option>
+            <option>Shopping</option>
+            <option>Travel</option>
+          `}
+        </select>
+      </div>
     </div>
 
     <!-- Research -->
@@ -627,6 +685,7 @@ function validate() {
     const resEffort = document.getElementById(`resEffort_${id}`).value;
 
     if (!caseNum) { highlight(`caseNum_${id}`); ok = false; }
+    if (!document.getElementById(`reqType_${id}`).value) { highlight(`reqType_${id}`); ok = false; }
     if (!resEffort && resEffort !== "0") { highlight(`resEffort_${id}`); ok = false; }
   });
 
@@ -653,13 +712,14 @@ function buildPayload() {
 
   document.querySelectorAll(".case-block").forEach(block => {
     const id = block.dataset.caseId;
-    const caseNum   = document.getElementById(`caseNum_${id}`).value;
-    const resEffort = parseInt(document.getElementById(`resEffort_${id}`).value) || 0;
+    const caseNum    = document.getElementById(`caseNum_${id}`).value;
+    const reqType    = document.getElementById(`reqType_${id}`).value;
+    const resEffort  = parseInt(document.getElementById(`resEffort_${id}`).value) || 0;
 
     // Research row (all members)
     if (resEffort > 0) {
       rows.push({ date, name, region, wfh_wfo: wfh, case_number: caseNum,
-                  task: "Research", effort_mins: resEffort });
+                  request_type: reqType, task: "Research", effort_mins: resEffort });
     }
 
     // Workflow row (UK only)
@@ -667,7 +727,7 @@ function buildPayload() {
       const wfEffort = parseInt(document.getElementById(`wfEffort_${id}`).value) || 0;
       if (wfEffort > 0) {
         rows.push({ date, name, region, wfh_wfo: wfh, case_number: caseNum,
-                    task: "Workflow", effort_mins: wfEffort });
+                    request_type: reqType, task: "Workflow", effort_mins: wfEffort });
       }
     }
   });
